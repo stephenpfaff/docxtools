@@ -25,6 +25,8 @@ enum Commands {
     /// List the text from the document to the console
     Cat(CatArgs),
 
+    HelixUrl(HelixUrlArgs),
+
     /// List the links in the document to the console
     Links(LinksArgs),
 
@@ -43,6 +45,13 @@ enum Commands {
 
 #[derive(Args)]
 struct CatArgs {
+}
+
+#[derive(Args)]
+struct HelixUrlArgs {
+    root: String,
+    repository: String,
+    org: String,
 }
 
 #[derive(Args)]
@@ -104,6 +113,12 @@ fn real_main(args: Cli) -> i32 {
     match &args.command {
         Commands::Cat(_) => {
             XMLUtil::cat(&temp_dir, &src_file);
+        },
+        Commands::HelixUrl(helix_url_args) => {
+            let root = &helix_url_args.root.replace("\\", "");
+            let mut new_path = src_file.replace(&*root, "").replace(".docx", "");
+            new_path = format!("https://main--{}--{}{}{}", &helix_url_args.repository, &helix_url_args.org, ".hlx.page", new_path);
+            println!("{}", new_path);
         },
         Commands::Links(_) => {
             XMLUtil::cat_rel_attr (
